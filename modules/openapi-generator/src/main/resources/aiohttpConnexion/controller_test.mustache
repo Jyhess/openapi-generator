@@ -1,0 +1,43 @@
+# coding: utf-8
+
+import json
+from aiohttp import web
+
+{{#imports}}{{import}}
+{{/imports}}
+
+{{#operations}}
+{{#operation}}
+
+async def test_{{operationId}}(client):
+    """Test case for {{{operationId}}}
+
+    {{{summary}}}
+    """
+    {{#bodyParam}}
+    {{paramName}} = {{{example}}}.to_dict()
+    {{/bodyParam}}
+    {{#queryParams}}
+    {{#-first}}params = [{{/-first}}{{^-first}}                {{/-first}}('{{paramName}}', {{{example}}}){{#hasMore}},{{/hasMore}}{{#-last}}]{{/-last}}
+    {{/queryParams}}
+    headers = {
+        'Accept': 'application/json',{{#bodyParam}}
+        'Content-Type': 'application/json',{{/bodyParam}}{{#headerParams}}
+        '{{paramName}}': {{{example}}},{{/headerParams}}{{#authMethods}}
+        {{#isOAuth}}'Authorization': 'Bearer special-key',{{/isOAuth}}{{#isApiKey}}'{{name}}': 'special-key',{{/isApiKey}}{{/authMethods}}
+    }
+    {{#formParams}}
+    {{#-first}}data = dict({{/-first}}{{^-first}}            {{/-first}}{{paramName}}={{{example}}}{{#hasMore}},{{/hasMore}}{{#-last}}){{/-last}}
+    {{/formParams}}
+    response = await client.request(
+        method='{{httpMethod}}',
+        path='{{#contextPath}}{{{.}}}{{/contextPath}}{{{path}}}'{{#pathParams}}{{#-first}}.format({{/-first}}{{paramName}}={{{example}}}{{#hasMore}}, {{/hasMore}}{{^hasMore}}){{/hasMore}}{{/pathParams}},
+        headers=headers,{{#bodyParam}}
+        json={{paramName}},{{/bodyParam}}{{#formParams}}{{#-first}}
+        data=data,{{/-first}}{{/formParams}}{{#queryParams}}{{#-first}}
+        params=params,{{/-first}}{{/queryParams}}
+        )
+    assert response.status == 200, 'Response body is : ' + (await response.read()).decode('utf-8')
+
+{{/operation}}
+{{/operations}}

@@ -24,11 +24,9 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/Pet'
-          application/xml:
-            schema:
-              $ref: '#/components/schemas/Pet'
         description: Pet object that needs to be added to the store
         required: true
+        x-body-name: body
       responses:
         405:
           content: {}
@@ -41,6 +39,7 @@ paths:
       tags:
       - pet
       x-openapi-router-controller: openapi_server.controllers.pet_controller
+      x-codegen-request-body-name: body
     put:
       operationId: update_pet
       requestBody:
@@ -48,11 +47,9 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/Pet'
-          application/xml:
-            schema:
-              $ref: '#/components/schemas/Pet'
         description: Pet object that needs to be added to the store
         required: true
+        x-body-name: body
       responses:
         400:
           content: {}
@@ -71,6 +68,7 @@ paths:
       tags:
       - pet
       x-openapi-router-controller: openapi_server.controllers.pet_controller
+      x-codegen-request-body-name: body
   /pet/findByStatus:
     get:
       description: Multiple status values can be provided with comma separated strings
@@ -94,11 +92,6 @@ paths:
       responses:
         200:
           content:
-            application/xml:
-              schema:
-                items:
-                  $ref: '#/components/schemas/Pet'
-                type: array
             application/json:
               schema:
                 items:
@@ -135,11 +128,6 @@ paths:
       responses:
         200:
           content:
-            application/xml:
-              schema:
-                items:
-                  $ref: '#/components/schemas/Pet'
-                type: array
             application/json:
               schema:
                 items:
@@ -157,7 +145,7 @@ paths:
       tags:
       - pet
       x-openapi-router-controller: openapi_server.controllers.pet_controller
-  /pet/{petId}:
+  /pet/{pet_id}:
     delete:
       operationId: delete_pet
       parameters:
@@ -167,7 +155,7 @@ paths:
           type: string
       - description: Pet id to delete
         in: path
-        name: petId
+        name: pet_id
         required: true
         schema:
           format: int64
@@ -190,7 +178,7 @@ paths:
       parameters:
       - description: ID of pet to return
         in: path
-        name: petId
+        name: pet_id
         required: true
         schema:
           format: int64
@@ -198,9 +186,6 @@ paths:
       responses:
         200:
           content:
-            application/xml:
-              schema:
-                $ref: '#/components/schemas/Pet'
             application/json:
               schema:
                 $ref: '#/components/schemas/Pet'
@@ -222,7 +207,7 @@ paths:
       parameters:
       - description: ID of pet that needs to be updated
         in: path
-        name: petId
+        name: pet_id
         required: true
         schema:
           format: int64
@@ -238,6 +223,7 @@ paths:
                 status:
                   description: Updated status of the pet
                   type: string
+        x-body-name: body
       responses:
         405:
           content: {}
@@ -250,13 +236,14 @@ paths:
       tags:
       - pet
       x-openapi-router-controller: openapi_server.controllers.pet_controller
-  /pet/{petId}/uploadImage:
+      x-codegen-request-body-name: body
+  /pet/{pet_id}/uploadImage:
     post:
       operationId: upload_file
       parameters:
       - description: ID of pet to update
         in: path
-        name: petId
+        name: pet_id
         required: true
         schema:
           format: int64
@@ -273,6 +260,7 @@ paths:
                   description: file to upload
                   format: binary
                   type: string
+        x-body-name: body
       responses:
         200:
           content:
@@ -288,6 +276,7 @@ paths:
       tags:
       - pet
       x-openapi-router-controller: openapi_server.controllers.pet_controller
+      x-codegen-request-body-name: body
   /store/inventory:
     get:
       description: Returns a map of status codes to quantities
@@ -313,17 +302,15 @@ paths:
       operationId: place_order
       requestBody:
         content:
-          '*/*':
+          application/json:
             schema:
               $ref: '#/components/schemas/Order'
         description: order placed for purchasing the pet
         required: true
+        x-body-name: body
       responses:
         200:
           content:
-            application/xml:
-              schema:
-                $ref: '#/components/schemas/Order'
             application/json:
               schema:
                 $ref: '#/components/schemas/Order'
@@ -335,14 +322,15 @@ paths:
       tags:
       - store
       x-openapi-router-controller: openapi_server.controllers.store_controller
-  /store/order/{orderId}:
+      x-codegen-request-body-name: body
+  /store/order/{order_id}:
     delete:
       description: For valid response try integer IDs with value < 1000. Anything above 1000 or nonintegers will generate API errors
       operationId: delete_order
       parameters:
       - description: ID of the order that needs to be deleted
         in: path
-        name: orderId
+        name: order_id
         required: true
         schema:
           type: string
@@ -363,7 +351,7 @@ paths:
       parameters:
       - description: ID of pet that needs to be fetched
         in: path
-        name: orderId
+        name: order_id
         required: true
         schema:
           format: int64
@@ -373,9 +361,6 @@ paths:
       responses:
         200:
           content:
-            application/xml:
-              schema:
-                $ref: '#/components/schemas/Order'
             application/json:
               schema:
                 $ref: '#/components/schemas/Order'
@@ -396,11 +381,12 @@ paths:
       operationId: create_user
       requestBody:
         content:
-          '*/*':
+          application/json:
             schema:
               $ref: '#/components/schemas/User'
         description: Created user object
         required: true
+        x-body-name: body
       responses:
         default:
           content: {}
@@ -409,18 +395,20 @@ paths:
       tags:
       - user
       x-openapi-router-controller: openapi_server.controllers.user_controller
+      x-codegen-request-body-name: body
   /user/createWithArray:
     post:
       operationId: create_users_with_array_input
       requestBody:
         content:
-          '*/*':
+          application/json:
             schema:
               items:
                 $ref: '#/components/schemas/User'
               type: array
         description: List of user object
         required: true
+        x-body-name: body
       responses:
         default:
           content: {}
@@ -429,18 +417,20 @@ paths:
       tags:
       - user
       x-openapi-router-controller: openapi_server.controllers.user_controller
+      x-codegen-request-body-name: body
   /user/createWithList:
     post:
       operationId: create_users_with_list_input
       requestBody:
         content:
-          '*/*':
+          application/json:
             schema:
               items:
                 $ref: '#/components/schemas/User'
               type: array
         description: List of user object
         required: true
+        x-body-name: body
       responses:
         default:
           content: {}
@@ -449,6 +439,7 @@ paths:
       tags:
       - user
       x-openapi-router-controller: openapi_server.controllers.user_controller
+      x-codegen-request-body-name: body
   /user/login:
     get:
       operationId: login_user
@@ -468,9 +459,6 @@ paths:
       responses:
         200:
           content:
-            application/xml:
-              schema:
-                type: string
             application/json:
               schema:
                 type: string
@@ -538,9 +526,6 @@ paths:
       responses:
         200:
           content:
-            application/xml:
-              schema:
-                $ref: '#/components/schemas/User'
             application/json:
               schema:
                 $ref: '#/components/schemas/User'
@@ -567,11 +552,12 @@ paths:
           type: string
       requestBody:
         content:
-          '*/*':
+          application/json:
             schema:
               $ref: '#/components/schemas/User'
         description: Updated user object
         required: true
+        x-body-name: body
       responses:
         400:
           content: {}
@@ -583,6 +569,7 @@ paths:
       tags:
       - user
       x-openapi-router-controller: openapi_server.controllers.user_controller
+      x-codegen-request-body-name: body
 components:
   schemas:
     Order:
