@@ -32,12 +32,12 @@ class Pet(Model):
         :type status: str
         """
         self.openapi_types = {
-            'id': 'long',
-            'category': 'Category',
-            'name': 'str',
-            'photo_urls': 'List[str]',
-            'tags': 'List[Tag]',
-            'status': 'str'
+            'id': long,
+            'category': Category,
+            'name': str,
+            'photo_urls': List[str],
+            'tags': List[Tag],
+            'status': str
         }
 
         self.attribute_map = {
