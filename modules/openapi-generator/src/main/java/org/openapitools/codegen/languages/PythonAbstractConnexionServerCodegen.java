@@ -756,6 +756,33 @@ public class PythonAbstractConnexionServerCodegen extends DefaultCodegen impleme
     }
 
     @Override
+    public Map<String, Object> postProcessAllModels(Map<String, Object> objs) {
+        Map<String, Object> result = super.postProcessAllModels(objs);
+        for (Map.Entry<String, Object> entry : result.entrySet()) {
+            Map<String, Object> inner = (Map<String, Object>) entry.getValue();
+            List<Map<String, Object>> models = (List<Map<String, Object>>) inner.get("models");
+            for (Map<String, Object> mo : models) {
+                CodegenModel cm = (CodegenModel) mo.get("model");
+                // Add additional filename information for imports
+                mo.put("pyImports", toPyImports(cm, cm.imports));
+            }
+        }
+        return result;
+    }
+
+    private List<Map<String, String>> toPyImports(CodegenModel cm, Set<String> imports) {
+        List<Map<String, String>> pyImports = new ArrayList<>();
+        for (String im : imports) {
+            if (!im.equals(cm.classname)) {
+                HashMap<String, String> pyImport = new HashMap<>();
+                pyImport.put("import", toModelImport(im));
+                pyImports.add(pyImport);
+            }
+        }
+        return pyImports;
+    }
+
+    @Override
     public void postProcessParameter(CodegenParameter parameter) {
         postProcessPattern(parameter.pattern, parameter.vendorExtensions);
     }
