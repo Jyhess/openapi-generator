@@ -26,9 +26,9 @@ public class PythonAiohttpConnexionServerCodegen extends PythonAbstractConnexion
     private static final Logger LOGGER = LoggerFactory.getLogger(PythonAiohttpConnexionServerCodegen.class);
 
     public PythonAiohttpConnexionServerCodegen() {
-        super("aiohttpConnexion", true, true);
+        super("python-aiohttp", true, true);
         testPackage = "tests";
-        embeddedTemplateDir = templateDir = "aiohttpConnexion";
+        embeddedTemplateDir = templateDir = "python-aiohttp";
     }
 
     /**
