@@ -1,6 +1,7 @@
 # coding: utf-8
 
 from __future__ import absolute_import
+import unittest
 
 from flask import json
 from six import BytesIO
@@ -12,43 +13,58 @@ from openapi_server.test import BaseTestCase
 class TestUserController(BaseTestCase):
     """UserController integration test stubs"""
 
+    @unittest.skip("*/* not supported by Connexion. Use application/json instead. See https://github.com/zalando/connexion/pull/760")
     def test_create_user(self):
         """Test case for create_user
 
         Create user
         """
-        user = User()
+        user = {}
+        headers = { 
+            'Content-Type': 'application/json',
+        }
         response = self.client.open(
             '/v2/user',
             method='POST',
+            headers=headers,
             data=json.dumps(user),
             content_type='application/json')
         self.assert200(response,
                        'Response body is : ' + response.data.decode('utf-8'))
 
+    @unittest.skip("*/* not supported by Connexion. Use application/json instead. See https://github.com/zalando/connexion/pull/760")
     def test_create_users_with_array_input(self):
         """Test case for create_users_with_array_input
 
         Creates list of users with given input array
         """
-        user = None
+        user = []
+        headers = { 
+            'Content-Type': 'application/json',
+        }
         response = self.client.open(
             '/v2/user/createWithArray',
             method='POST',
+            headers=headers,
             data=json.dumps(user),
             content_type='application/json')
         self.assert200(response,
                        'Response body is : ' + response.data.decode('utf-8'))
 
+    @unittest.skip("*/* not supported by Connexion. Use application/json instead. See https://github.com/zalando/connexion/pull/760")
     def test_create_users_with_list_input(self):
         """Test case for create_users_with_list_input
 
         Creates list of users with given input array
         """
-        user = None
+        user = []
+        headers = { 
+            'Content-Type': 'application/json',
+        }
         response = self.client.open(
             '/v2/user/createWithList',
             method='POST',
+            headers=headers,
             data=json.dumps(user),
             content_type='application/json')
         self.assert200(response,
@@ -59,9 +75,12 @@ class TestUserController(BaseTestCase):
 
         Delete user
         """
+        headers = { 
+        }
         response = self.client.open(
             '/v2/user/{username}'.format(username='username_example'),
-            method='DELETE')
+            method='DELETE',
+            headers=headers)
         self.assert200(response,
                        'Response body is : ' + response.data.decode('utf-8'))
 
@@ -70,9 +89,13 @@ class TestUserController(BaseTestCase):
 
         Get user by user name
         """
+        headers = { 
+            'Accept': 'application/json',
+        }
         response = self.client.open(
             '/v2/user/{username}'.format(username='username_example'),
-            method='GET')
+            method='GET',
+            headers=headers)
         self.assert200(response,
                        'Response body is : ' + response.data.decode('utf-8'))
 
@@ -83,9 +106,13 @@ class TestUserController(BaseTestCase):
         """
         query_string = [('username', 'username_example'),
                         ('password', 'password_example')]
+        headers = { 
+            'Accept': 'application/json',
+        }
         response = self.client.open(
             '/v2/user/login',
             method='GET',
+            headers=headers,
             query_string=query_string)
         self.assert200(response,
                        'Response body is : ' + response.data.decode('utf-8'))
@@ -95,21 +122,29 @@ class TestUserController(BaseTestCase):
 
         Logs out current logged in user session
         """
+        headers = { 
+        }
         response = self.client.open(
             '/v2/user/logout',
-            method='GET')
+            method='GET',
+            headers=headers)
         self.assert200(response,
                        'Response body is : ' + response.data.decode('utf-8'))
 
+    @unittest.skip("*/* not supported by Connexion. Use application/json instead. See https://github.com/zalando/connexion/pull/760")
     def test_update_user(self):
         """Test case for update_user
 
         Updated user
         """
-        user = User()
+        user = {}
+        headers = { 
+            'Content-Type': 'application/json',
+        }
         response = self.client.open(
             '/v2/user/{username}'.format(username='username_example'),
             method='PUT',
+            headers=headers,
             data=json.dumps(user),
             content_type='application/json')
         self.assert200(response,
@@ -117,5 +152,4 @@ class TestUserController(BaseTestCase):
 
 
 if __name__ == '__main__':
-    import unittest
     unittest.main()

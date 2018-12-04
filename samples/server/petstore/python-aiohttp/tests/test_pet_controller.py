@@ -1,20 +1,38 @@
 # coding: utf-8
 
+import pytest
 import json
 from aiohttp import web
+from aiohttp import FormData
 
 from openapi_server.models.api_response import ApiResponse
 from openapi_server.models.pet import Pet
 
 
+@pytest.mark.skip("Connexion does not support multiple consummes. See https://github.com/zalando/connexion/pull/760")
 async def test_add_pet(client):
     """Test case for add_pet
 
     Add a new pet to the store
     """
-    body = Pet().to_dict()
-    headers = {
-        'Accept': 'application/json',
+    body = {
+  "photoUrls" : [ "photoUrls", "photoUrls" ],
+  "name" : "doggie",
+  "id" : 0,
+  "category" : {
+    "name" : "name",
+    "id" : 6
+  },
+  "tags" : [ {
+    "name" : "name",
+    "id" : 1
+  }, {
+    "name" : "name",
+    "id" : 1
+  } ],
+  "status" : "available"
+}
+    headers = { 
         'Content-Type': 'application/json',
         'Authorization': 'Bearer special-key',
     }
@@ -32,8 +50,7 @@ async def test_delete_pet(client):
 
     Deletes a pet
     """
-    headers = {
-        'Accept': 'application/json',
+    headers = { 
         'api_key': 'api_key_example',
         'Authorization': 'Bearer special-key',
     }
@@ -51,7 +68,7 @@ async def test_find_pets_by_status(client):
     Finds Pets by status
     """
     params = [('status', 'available')]
-    headers = {
+    headers = { 
         'Accept': 'application/json',
         'Authorization': 'Bearer special-key',
     }
@@ -70,7 +87,7 @@ async def test_find_pets_by_tags(client):
     Finds Pets by tags
     """
     params = [('tags', 'tags_example')]
-    headers = {
+    headers = { 
         'Accept': 'application/json',
         'Authorization': 'Bearer special-key',
     }
@@ -88,7 +105,7 @@ async def test_get_pet_by_id(client):
 
     Find pet by ID
     """
-    headers = {
+    headers = { 
         'Accept': 'application/json',
         'api_key': 'special-key',
     }
@@ -100,14 +117,30 @@ async def test_get_pet_by_id(client):
     assert response.status == 200, 'Response body is : ' + (await response.read()).decode('utf-8')
 
 
+@pytest.mark.skip("Connexion does not support multiple consummes. See https://github.com/zalando/connexion/pull/760")
 async def test_update_pet(client):
     """Test case for update_pet
 
     Update an existing pet
     """
-    body = Pet().to_dict()
-    headers = {
-        'Accept': 'application/json',
+    body = {
+  "photoUrls" : [ "photoUrls", "photoUrls" ],
+  "name" : "doggie",
+  "id" : 0,
+  "category" : {
+    "name" : "name",
+    "id" : 6
+  },
+  "tags" : [ {
+    "name" : "name",
+    "id" : 1
+  }, {
+    "name" : "name",
+    "id" : 1
+  } ],
+  "status" : "available"
+}
+    headers = { 
         'Content-Type': 'application/json',
         'Authorization': 'Bearer special-key',
     }
@@ -120,17 +153,20 @@ async def test_update_pet(client):
     assert response.status == 200, 'Response body is : ' + (await response.read()).decode('utf-8')
 
 
+@pytest.mark.skip("application/x-www-form-urlencoded not supported by Connexion")
 async def test_update_pet_with_form(client):
     """Test case for update_pet_with_form
 
     Updates a pet in the store with form data
     """
-    headers = {
-        'Accept': 'application/json',
+    headers = { 
+        'Content-Type': 'application/x-www-form-urlencoded',
         'Authorization': 'Bearer special-key',
     }
-    data = dict(name='name_example',
-                status='status_example')
+    data = {
+        'name': 'name_example',
+        'status': 'status_example'
+        }
     response = await client.request(
         method='POST',
         path='/v2/pet/{pet_id}'.format(pet_id=56),
@@ -140,17 +176,20 @@ async def test_update_pet_with_form(client):
     assert response.status == 200, 'Response body is : ' + (await response.read()).decode('utf-8')
 
 
+@pytest.mark.skip("multipart/form-data not supported by Connexion")
 async def test_upload_file(client):
     """Test case for upload_file
 
     uploads an image
     """
-    headers = {
+    headers = { 
         'Accept': 'application/json',
+        'Content-Type': 'multipart/form-data',
         'Authorization': 'Bearer special-key',
     }
-    data = dict(additional_metadata='additional_metadata_example',
-                file=(BytesIO(b'some file data'), 'file.txt'))
+    data = FormData()
+    data.add_field('additional_metadata', 'additional_metadata_example')
+    data.add_field('file', (BytesIO(b'some file data'), 'file.txt'))
     response = await client.request(
         method='POST',
         path='/v2/pet/{pet_id}/uploadImage'.format(pet_id=56),

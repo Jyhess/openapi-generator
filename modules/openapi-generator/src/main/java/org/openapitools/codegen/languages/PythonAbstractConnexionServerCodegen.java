@@ -47,6 +47,7 @@ public class PythonAbstractConnexionServerCodegen extends DefaultCodegen impleme
     public static final String CONTROLLER_PACKAGE = "controllerPackage";
     public static final String DEFAULT_CONTROLLER = "defaultController";
     public static final String SUPPORT_PYTHON2 = "supportPython2";
+    static final String MEDIA_TYPE = "mediaType";
 
     protected int serverPort = 8080;
     protected String packageName;
@@ -54,12 +55,10 @@ public class PythonAbstractConnexionServerCodegen extends DefaultCodegen impleme
     protected String controllerPackage;
     protected String defaultController;
     protected Map<Character, String> regexModifiers;
-    protected boolean fixParameterName;
     protected boolean fixBodyName;
 
-    public PythonAbstractConnexionServerCodegen(String templateDirectory, boolean fixParameterNameValue, boolean fixBodyNameValue) {
+    public PythonAbstractConnexionServerCodegen(String templateDirectory, boolean fixBodyNameValue) {
         super();
-        fixParameterName = fixParameterNameValue;
         fixBodyName = fixBodyNameValue;
         modelPackage = "models";
         testPackage = "test";
@@ -130,9 +129,6 @@ public class PythonAbstractConnexionServerCodegen extends DefaultCodegen impleme
         supportingFiles.add(new SupportingFile("README.mustache", "", "README.md"));
         supportingFiles.add(new SupportingFile("test-requirements.mustache", "", "test-requirements.txt"));
         supportingFiles.add(new SupportingFile("requirements.mustache", "", "requirements.txt"));
-        supportingFiles.add(new SupportingFile("gitignore.mustache", "", ".gitignore"));
-        supportingFiles.add(new SupportingFile("Dockerfile.mustache", "", "Dockerfile"));
-        supportingFiles.add(new SupportingFile("dockerignore.mustache", "", ".dockerignore"));
 
         regexModifiers = new HashMap<Character, String>();
         regexModifiers.put('i', "IGNORECASE");
@@ -334,11 +330,8 @@ public class PythonAbstractConnexionServerCodegen extends DefaultCodegen impleme
                     }
                     if (!fixedPath.equals(pathname)) {
                         LOGGER.warn("Path '" + pathname + "' is not consistant with Python variable names. It will be replaced by '" + fixedPath + "'");
-                        // Is it okay to replace automatically ?
-                        if (fixParameterName) {
-                            paths.remove(pathname);
-                            paths.put(fixedPath, path);
-                        }
+                        paths.remove(pathname);
+                        paths.put(fixedPath, path);
                     }
                 }
                 Map<HttpMethod, Operation> operationMap = path.readOperationsMap();
@@ -366,10 +359,7 @@ public class PythonAbstractConnexionServerCodegen extends DefaultCodegen impleme
                                 String pythonParameterName = this.toParamName(swaggerParameterName);
                                 if (!swaggerParameterName.equals(pythonParameterName)) {
                                     LOGGER.warn("Parameter name '" + swaggerParameterName + "' is not consistant with Python variable names. It will be replaced by '" + pythonParameterName + "'");
-                                    // Is it okay to replace automatically ?
-                                    if (fixParameterName) {
-                                        parameter.setName(pythonParameterName);
-                                    }
+                                    parameter.setName(pythonParameterName);
                                 }
                                 if (swaggerParameterName.isEmpty()) {
                                     LOGGER.error("Missing parameter name in " + pathname + "." + parameter.getIn());
@@ -395,13 +385,11 @@ public class PythonAbstractConnexionServerCodegen extends DefaultCodegen impleme
                 }
             }
             // Sort path names after variable name fix
-            if (fixParameterName) {
-                List<String> fixedPathnames = new ArrayList(paths.keySet());
-                Collections.sort(fixedPathnames);
-                for (String pathname: fixedPathnames) {
-                    PathItem pathItem = paths.remove(pathname);
-                    paths.put(pathname, pathItem);
-                }
+            List<String> fixedPathnames = new ArrayList(paths.keySet());
+            Collections.sort(fixedPathnames);
+            for (String pathname: fixedPathnames) {
+                PathItem pathItem = paths.remove(pathname);
+                paths.put(pathname, pathItem);
             }
         }
         addSecurityExtensions(openAPI);
@@ -683,7 +671,7 @@ public class PythonAbstractConnexionServerCodegen extends DefaultCodegen impleme
             example = "'" + escapeText(example) + "'";
         } else if (!languageSpecificPrimitives.contains(type)) {
             // type is a model class, e.g. User
-            example = type + "()";
+            example = "{}";
         } else {
             LOGGER.warn("Type " + type + " not handled properly in setParameterExampleValue");
         }
@@ -692,7 +680,12 @@ public class PythonAbstractConnexionServerCodegen extends DefaultCodegen impleme
             example = p.items.defaultValue;
         }
         if (example == null) {
-            example = "None";
+            if (Boolean.TRUE.equals(p.isListContainer)) {
+                example = "[]";
+            }
+            else {
+                example = "None";
+            }
         } else if (Boolean.TRUE.equals(p.isListContainer)) {
             if (Boolean.TRUE.equals(p.isBodyParam)) {
                 example = "[" + example + "]";
@@ -784,6 +777,66 @@ public class PythonAbstractConnexionServerCodegen extends DefaultCodegen impleme
     @Override
     public void postProcessParameter(CodegenParameter parameter) {
         postProcessPattern(parameter.pattern, parameter.vendorExtensions);
+    }
+
+    @Override
+    public Map<String, Object> postProcessOperationsWithModels(Map<String, Object> objs, List<Object> allModels) {
+        Map<String, Object> operations = (Map<String, Object>) objs.get("operations");
+        List<CodegenOperation> operationList = (List<CodegenOperation>) operations.get("operation");
+
+        for (CodegenOperation operation : operationList) {
+            Map<String, String> skipTests = new HashMap<>();
+            // Set flag to deactivate tests due to connexion issue.
+            if (operation.consumes != null ) {
+                if (operation.consumes.size() == 1) {
+                    Map<String, String> consume = operation.consumes.get(0);
+                    if (! "application/json".equals(consume.get(MEDIA_TYPE))) {
+                        skipTests.put("reason", consume.get(MEDIA_TYPE) + " not supported by Connexion");
+                        if ("multipart/form-data".equals(consume.get(MEDIA_TYPE))) {
+                            operation.isMultipart = Boolean.TRUE;
+                        }
+                    }
+                    operation.vendorExtensions.put("x-prefered-consume", consume);
+                }
+                else if (operation.consumes.size() > 1) {
+                    Map<String, String> consume = operation.consumes.get(0);
+                    skipTests.put("reason", "Connexion does not support multiple consummes. See https://github.com/zalando/connexion/pull/760");
+                    operation.vendorExtensions.put("x-prefered-consume", consume);
+                    if ("multipart/form-data".equals(consume.get(MEDIA_TYPE))) {
+                        operation.isMultipart = Boolean.TRUE;
+                    }
+                }
+            }
+            else {
+                // A body without consumes means '*/*' has been used instead of application/json
+                if (operation.bodyParam != null) {
+                    Map<String, String> consume = new HashMap<>();
+                    consume.put(MEDIA_TYPE, "application/json");
+                    operation.vendorExtensions.put("x-prefered-consume", consume);
+                    skipTests.put("reason", "*/* not supported by Connexion. Use application/json instead. See https://github.com/zalando/connexion/pull/760");
+                }
+            }
+            // Choose to consume 'application/json' if available, else choose the last one.
+            if (operation.produces != null ) {
+                for (Map<String, String> produce: operation.produces) {
+                    operation.vendorExtensions.put("x-prefered-produce", produce);
+                    if (produce.get(MEDIA_TYPE).equals("application/json")) {
+                        break;
+                    }
+                }
+            }
+            if (! skipTests.isEmpty()) {
+                operation.vendorExtensions.put("x-skip-test", skipTests);
+            }
+            if (operation.requestBodyExamples != null) {
+                for (Map<String, String> example: operation.requestBodyExamples) {
+                    if (example.get("contentType") != null && example.get("contentType").equals("application/json")) {
+                        operation.bodyParam.example = example.get("example");
+                    }
+                }
+            }
+        }
+        return objs;
     }
 
     /*

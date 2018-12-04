@@ -1,7 +1,15 @@
 # coding: utf-8
 
+import pytest
 import json
 from aiohttp import web
+{{#operations}}
+{{#operation}}
+{{#isMultipart}}
+from aiohttp import FormData
+{{/isMultipart}}
+{{/operation}}
+{{/operations}}
 
 {{#imports}}{{import}}
 {{/imports}}
@@ -9,25 +17,42 @@ from aiohttp import web
 {{#operations}}
 {{#operation}}
 
+{{#vendorExtensions.x-skip-test}}
+@pytest.mark.skip("{{reason}}")
+{{/vendorExtensions.x-skip-test}}
 async def test_{{operationId}}(client):
     """Test case for {{{operationId}}}
 
     {{{summary}}}
     """
     {{#bodyParam}}
-    {{paramName}} = {{{example}}}.to_dict()
+    {{paramName}} = {{{example}}}
     {{/bodyParam}}
     {{#queryParams}}
     {{#-first}}params = [{{/-first}}{{^-first}}                {{/-first}}('{{paramName}}', {{{example}}}){{#hasMore}},{{/hasMore}}{{#-last}}]{{/-last}}
     {{/queryParams}}
-    headers = {
-        'Accept': 'application/json',{{#bodyParam}}
-        'Content-Type': 'application/json',{{/bodyParam}}{{#headerParams}}
+    headers = { {{#vendorExtensions.x-prefered-produce}}
+        'Accept': '{{mediaType}}',{{/vendorExtensions.x-prefered-produce}}{{#vendorExtensions.x-prefered-consume}}
+        'Content-Type': '{{mediaType}}',{{/vendorExtensions.x-prefered-consume}}{{#headerParams}}
         '{{paramName}}': {{{example}}},{{/headerParams}}{{#authMethods}}
         {{#isOAuth}}'Authorization': 'Bearer special-key',{{/isOAuth}}{{#isApiKey}}'{{name}}': 'special-key',{{/isApiKey}}{{/authMethods}}
     }
     {{#formParams}}
-    {{#-first}}data = dict({{/-first}}{{^-first}}            {{/-first}}{{paramName}}={{{example}}}{{#hasMore}},{{/hasMore}}{{#-last}}){{/-last}}
+    {{#isMultipart}}
+    {{#-first}}
+    data = FormData()
+    {{/-first}}
+    data.add_field('{{paramName}}', {{{example}}})
+    {{/isMultipart}}
+    {{^isMultipart}}
+    {{#-first}}
+    data = {
+    {{/-first}}
+        '{{paramName}}': {{{example}}}{{#hasMore}},{{/hasMore}}
+    {{^hasMore}}
+        }
+    {{/hasMore}}
+    {{/isMultipart}}
     {{/formParams}}
     response = await client.request(
         method='{{httpMethod}}',

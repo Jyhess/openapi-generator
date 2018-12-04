@@ -157,7 +157,7 @@ paths:
       tags:
       - pet
       x-openapi-router-controller: openapi_server.controllers.pet_controller
-  /pet/{petId}:
+  /pet/{pet_id}:
     delete:
       operationId: delete_pet
       parameters:
@@ -167,7 +167,7 @@ paths:
           type: string
       - description: Pet id to delete
         in: path
-        name: petId
+        name: pet_id
         required: true
         schema:
           format: int64
@@ -190,7 +190,7 @@ paths:
       parameters:
       - description: ID of pet to return
         in: path
-        name: petId
+        name: pet_id
         required: true
         schema:
           format: int64
@@ -222,7 +222,7 @@ paths:
       parameters:
       - description: ID of pet that needs to be updated
         in: path
-        name: petId
+        name: pet_id
         required: true
         schema:
           format: int64
@@ -250,13 +250,13 @@ paths:
       tags:
       - pet
       x-openapi-router-controller: openapi_server.controllers.pet_controller
-  /pet/{petId}/uploadImage:
+  /pet/{pet_id}/uploadImage:
     post:
       operationId: upload_file
       parameters:
       - description: ID of pet to update
         in: path
-        name: petId
+        name: pet_id
         required: true
         schema:
           format: int64
@@ -335,14 +335,14 @@ paths:
       tags:
       - store
       x-openapi-router-controller: openapi_server.controllers.store_controller
-  /store/order/{orderId}:
+  /store/order/{order_id}:
     delete:
       description: For valid response try integer IDs with value < 1000. Anything above 1000 or nonintegers will generate API errors
       operationId: delete_order
       parameters:
       - description: ID of the order that needs to be deleted
         in: path
-        name: orderId
+        name: order_id
         required: true
         schema:
           type: string
@@ -363,7 +363,7 @@ paths:
       parameters:
       - description: ID of pet that needs to be fetched
         in: path
-        name: orderId
+        name: order_id
         required: true
         schema:
           format: int64

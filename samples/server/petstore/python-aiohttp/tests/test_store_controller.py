@@ -1,5 +1,6 @@
 # coding: utf-8
 
+import pytest
 import json
 from aiohttp import web
 
@@ -11,8 +12,7 @@ async def test_delete_order(client):
 
     Delete purchase order by ID
     """
-    headers = {
-        'Accept': 'application/json',
+    headers = { 
     }
     response = await client.request(
         method='DELETE',
@@ -27,7 +27,7 @@ async def test_get_inventory(client):
 
     Returns pet inventories by status
     """
-    headers = {
+    headers = { 
         'Accept': 'application/json',
         'api_key': 'special-key',
     }
@@ -44,7 +44,7 @@ async def test_get_order_by_id(client):
 
     Find purchase order by ID
     """
-    headers = {
+    headers = { 
         'Accept': 'application/json',
     }
     response = await client.request(
@@ -55,13 +55,14 @@ async def test_get_order_by_id(client):
     assert response.status == 200, 'Response body is : ' + (await response.read()).decode('utf-8')
 
 
+@pytest.mark.skip("*/* not supported by Connexion. Use application/json instead. See https://github.com/zalando/connexion/pull/760")
 async def test_place_order(client):
     """Test case for place_order
 
     Place an order for a pet
     """
-    body = Order().to_dict()
-    headers = {
+    body = {}
+    headers = { 
         'Accept': 'application/json',
         'Content-Type': 'application/json',
     }

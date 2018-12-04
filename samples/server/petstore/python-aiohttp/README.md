@@ -30,22 +30,10 @@ Your OpenAPI definition lives here:
 http://localhost:8080/v2/openapi.json
 ```
 
-To launch the integration tests, use tox:
+To launch the integration tests, use pytest:
 ```
 sudo pip install -r test-requirements.txt
 pytest
-```
-
-## Running with Docker
-
-To run the server on a Docker container, please execute the following from the root directory:
-
-```bash
-# building the image
-docker build -t openapi_server .
-
-# starting up a container
-docker run -p 8080:8080 openapi_server
 ```
 
 ## Prevent file overriding
@@ -54,6 +42,5 @@ After first generation, add edited files to _.openapi-generator-ignore_ to preve
 ```
 server/controllers/*
 test/*
-Dockerfile
 *.txt
 ```

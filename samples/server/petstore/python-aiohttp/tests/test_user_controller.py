@@ -1,19 +1,20 @@
 # coding: utf-8
 
+import pytest
 import json
 from aiohttp import web
 
 from openapi_server.models.user import User
 
 
+@pytest.mark.skip("*/* not supported by Connexion. Use application/json instead. See https://github.com/zalando/connexion/pull/760")
 async def test_create_user(client):
     """Test case for create_user
 
     Create user
     """
-    body = User().to_dict()
-    headers = {
-        'Accept': 'application/json',
+    body = {}
+    headers = { 
         'Content-Type': 'application/json',
     }
     response = await client.request(
@@ -25,14 +26,14 @@ async def test_create_user(client):
     assert response.status == 200, 'Response body is : ' + (await response.read()).decode('utf-8')
 
 
+@pytest.mark.skip("*/* not supported by Connexion. Use application/json instead. See https://github.com/zalando/connexion/pull/760")
 async def test_create_users_with_array_input(client):
     """Test case for create_users_with_array_input
 
     Creates list of users with given input array
     """
-    body = None.to_dict()
-    headers = {
-        'Accept': 'application/json',
+    body = []
+    headers = { 
         'Content-Type': 'application/json',
     }
     response = await client.request(
@@ -44,14 +45,14 @@ async def test_create_users_with_array_input(client):
     assert response.status == 200, 'Response body is : ' + (await response.read()).decode('utf-8')
 
 
+@pytest.mark.skip("*/* not supported by Connexion. Use application/json instead. See https://github.com/zalando/connexion/pull/760")
 async def test_create_users_with_list_input(client):
     """Test case for create_users_with_list_input
 
     Creates list of users with given input array
     """
-    body = None.to_dict()
-    headers = {
-        'Accept': 'application/json',
+    body = []
+    headers = { 
         'Content-Type': 'application/json',
     }
     response = await client.request(
@@ -68,8 +69,7 @@ async def test_delete_user(client):
 
     Delete user
     """
-    headers = {
-        'Accept': 'application/json',
+    headers = { 
     }
     response = await client.request(
         method='DELETE',
@@ -84,7 +84,7 @@ async def test_get_user_by_name(client):
 
     Get user by user name
     """
-    headers = {
+    headers = { 
         'Accept': 'application/json',
     }
     response = await client.request(
@@ -102,7 +102,7 @@ async def test_login_user(client):
     """
     params = [('username', 'username_example'),
                     ('password', 'password_example')]
-    headers = {
+    headers = { 
         'Accept': 'application/json',
     }
     response = await client.request(
@@ -119,8 +119,7 @@ async def test_logout_user(client):
 
     Logs out current logged in user session
     """
-    headers = {
-        'Accept': 'application/json',
+    headers = { 
     }
     response = await client.request(
         method='GET',
@@ -130,14 +129,14 @@ async def test_logout_user(client):
     assert response.status == 200, 'Response body is : ' + (await response.read()).decode('utf-8')
 
 
+@pytest.mark.skip("*/* not supported by Connexion. Use application/json instead. See https://github.com/zalando/connexion/pull/760")
 async def test_update_user(client):
     """Test case for update_user
 
     Updated user
     """
-    body = User().to_dict()
-    headers = {
-        'Accept': 'application/json',
+    body = {}
+    headers = { 
         'Content-Type': 'application/json',
     }
     response = await client.request(
