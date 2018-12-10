@@ -370,14 +370,14 @@ configuration.password = 'YOUR_PASSWORD'
 
 # create an instance of the API class
 api_instance = petstore_api.FakeApi(petstore_api.ApiClient(configuration))
-number = 3.4 # float | None
-double = 3.4 # float | None
+number = 32.1 # float | None
+double = 67.8 # float | None
 pattern_without_delimiter = 'pattern_without_delimiter_example' # str | None
 byte = 'byte_example' # str | None
-integer = 56 # int | None (optional)
-int32 = 56 # int | None (optional)
+integer = 100 # int | None (optional)
+int32 = 200 # int | None (optional)
 int64 = 56 # int | None (optional)
-float = 3.4 # float | None (optional)
+float = 987.6 # float | None (optional)
 string = 'string_example' # str | None (optional)
 binary = '/path/to/file' # file | None (optional)
 date = '2013-10-20' # date | None (optional)

@@ -41,66 +41,24 @@ import java.util.*;
 import static org.openapitools.codegen.utils.StringUtils.camelize;
 import static org.openapitools.codegen.utils.StringUtils.underscore;
 
-public class PythonAbstractConnexionServerCodegen extends DefaultCodegen implements CodegenConfig {
+public class PythonAbstractConnexionServerCodegen extends PythonBaseCodegen {
     private static final Logger LOGGER = LoggerFactory.getLogger(PythonAbstractConnexionServerCodegen.class);
 
     public static final String CONTROLLER_PACKAGE = "controllerPackage";
     public static final String DEFAULT_CONTROLLER = "defaultController";
     public static final String SUPPORT_PYTHON2 = "supportPython2";
+    public static final String SERVER_PORT = "serverPort";
     static final String MEDIA_TYPE = "mediaType";
 
-    protected int serverPort = 8080;
-    protected String packageName;
-    protected String packageVersion;
-    protected String controllerPackage;
-    protected String defaultController;
-    protected Map<Character, String> regexModifiers;
+    protected String serverPort = "8080";
+    protected String controllerPackage = "controllers";
+    protected String defaultController = "default_controller";
     protected boolean fixBodyName;
 
     public PythonAbstractConnexionServerCodegen(String templateDirectory, boolean fixBodyNameValue) {
-        super();
+        super(templateDirectory, "openapi_server");
         fixBodyName = fixBodyNameValue;
-        modelPackage = "models";
         testPackage = "test";
-
-        languageSpecificPrimitives.clear();
-        languageSpecificPrimitives.add("int");
-        languageSpecificPrimitives.add("float");
-        languageSpecificPrimitives.add("List");
-        languageSpecificPrimitives.add("Dict");
-        languageSpecificPrimitives.add("bool");
-        languageSpecificPrimitives.add("str");
-        languageSpecificPrimitives.add("datetime");
-        languageSpecificPrimitives.add("date");
-        languageSpecificPrimitives.add("file");
-        languageSpecificPrimitives.add("object");
-
-        typeMapping.clear();
-        typeMapping.put("integer", "int");
-        typeMapping.put("float", "float");
-        typeMapping.put("number", "float");
-        typeMapping.put("long", "int");
-        typeMapping.put("double", "float");
-        typeMapping.put("array", "List");
-        typeMapping.put("map", "Dict");
-        typeMapping.put("boolean", "bool");
-        typeMapping.put("string", "str");
-        typeMapping.put("date", "date");
-        typeMapping.put("DateTime", "datetime");
-        typeMapping.put("object", "object");
-        typeMapping.put("file", "file");
-        typeMapping.put("UUID", "str");
-
-        // from https://docs.python.org/3/reference/lexical_analysis.html#keywords
-        setReservedWordsLowerCase(
-                Arrays.asList(
-                        // @property
-                        "property",
-                        // python reserved words
-                        "and", "del", "from", "not", "while", "as", "elif", "global", "or", "with",
-                        "assert", "else", "if", "pass", "yield", "break", "except", "import",
-                        "print", "class", "exec", "in", "raise", "continue", "finally", "is",
-                        "return", "def", "for", "lambda", "try", "self", "None", "True", "False", "nonlocal"));
 
         // set the output folder here
         outputFolder = "generated-code/connexion";
@@ -115,41 +73,10 @@ public class PythonAbstractConnexionServerCodegen extends DefaultCodegen impleme
          */
         embeddedTemplateDir = templateDir = templateDirectory;
 
-        /*
-         * Additional Properties.  These values can be passed to the templates and
-         * are available in models, apis, and supporting files
-         */
-        additionalProperties.put("serverPort", serverPort);
-
-        /*
-         * Supporting Files.  You can write single files for the generator with the
-         * entire object tree available.  If the input file has a suffix of `.mustache
-         * it will be processed by the template engine.  Otherwise, it will be copied
-         */
-        supportingFiles.add(new SupportingFile("README.mustache", "", "README.md"));
-        supportingFiles.add(new SupportingFile("test-requirements.mustache", "", "test-requirements.txt"));
-        supportingFiles.add(new SupportingFile("requirements.mustache", "", "requirements.txt"));
-
-        regexModifiers = new HashMap<Character, String>();
-        regexModifiers.put('i', "IGNORECASE");
-        regexModifiers.put('l', "LOCALE");
-        regexModifiers.put('m', "MULTILINE");
-        regexModifiers.put('s', "DOTALL");
-        regexModifiers.put('u', "UNICODE");
-        regexModifiers.put('x', "VERBOSE");
-
-        cliOptions.add(new CliOption(CodegenConstants.PACKAGE_NAME, "python package name (convention: snake_case).")
-                .defaultValue("openapi_server"));
-        cliOptions.add(new CliOption(CodegenConstants.PACKAGE_VERSION, "python package version.")
-                .defaultValue("1.0.0"));
-        cliOptions.add(new CliOption(CONTROLLER_PACKAGE, "controller package").
-                defaultValue("controllers"));
-        cliOptions.add(new CliOption(DEFAULT_CONTROLLER, "default controller").
-                defaultValue("default_controller"));
-        cliOptions.add(new CliOption(SUPPORT_PYTHON2, "support python2").
-                defaultValue("false"));
-        cliOptions.add(new CliOption("serverPort", "TCP port to listen to in app.run").
-                defaultValue("8080"));
+        addOption(CONTROLLER_PACKAGE, "controller package", controllerPackage);
+        addOption(DEFAULT_CONTROLLER, "default controller", defaultController);
+        addOption(SERVER_PORT, "TCP port to listen to in app.run", serverPort);
+        addSwitch(SUPPORT_PYTHON2, "support python2", Boolean.FALSE);
     }
 
     protected void addSupportingFiles() {
@@ -159,41 +86,31 @@ public class PythonAbstractConnexionServerCodegen extends DefaultCodegen impleme
     public void processOpts() {
         super.processOpts();
 
-        if (StringUtils.isEmpty(System.getenv("PYTHON_POST_PROCESS_FILE"))) {
-            LOGGER.info("Environment variable PYTHON_POST_PROCESS_FILE not defined so the Python code may not be properly formatted. To define it, try 'export PYTHON_POST_PROCESS_FILE=\"/usr/local/bin/yapf -i\"' (Linux/Mac)");
-            LOGGER.info("NOTE: To enable file post-processing, 'enablePostProcessFile' must be set to `true` (--enable-post-process-file for CLI).");
-        }
-
-        //apiTemplateFiles.clear();
-
-        if (additionalProperties.containsKey(CodegenConstants.PACKAGE_NAME)) {
-            setPackageName((String) additionalProperties.get(CodegenConstants.PACKAGE_NAME));
-        } else {
-            setPackageName("openapi_server");
-            additionalProperties.put(CodegenConstants.PACKAGE_NAME, this.packageName);
-        }
-        if (additionalProperties.containsKey(CodegenConstants.PACKAGE_VERSION)) {
-            setPackageVersion((String) additionalProperties.get(CodegenConstants.PACKAGE_VERSION));
-        } else {
-            setPackageVersion("1.0.0");
-            additionalProperties.put(CodegenConstants.PACKAGE_VERSION, this.packageVersion);
-        }
         if (additionalProperties.containsKey(CONTROLLER_PACKAGE)) {
             this.controllerPackage = additionalProperties.get(CONTROLLER_PACKAGE).toString();
         } else {
-            this.controllerPackage = "controllers";
             additionalProperties.put(CONTROLLER_PACKAGE, this.controllerPackage);
         }
+
         if (additionalProperties.containsKey(DEFAULT_CONTROLLER)) {
             this.defaultController = additionalProperties.get(DEFAULT_CONTROLLER).toString();
         } else {
-            this.defaultController = "default_controller";
             additionalProperties.put(DEFAULT_CONTROLLER, this.defaultController);
         }
+
+        if (additionalProperties.containsKey(SERVER_PORT)) {
+            this.serverPort = additionalProperties.get(SERVER_PORT).toString();
+        } else {
+            additionalProperties.put(SERVER_PORT, serverPort);
+        }
+
         if (Boolean.TRUE.equals(additionalProperties.get(SUPPORT_PYTHON2))) {
-            additionalProperties.put(SUPPORT_PYTHON2, Boolean.TRUE);
             typeMapping.put("long", "long");
         }
+
+        supportingFiles.add(new SupportingFile("README.mustache", "", "README.md"));
+        supportingFiles.add(new SupportingFile("test-requirements.mustache", "", "test-requirements.txt"));
+        supportingFiles.add(new SupportingFile("requirements.mustache", "", "requirements.txt"));
         supportingFiles.add(new SupportingFile("__main__.mustache", packageName, "__main__.py"));
         supportingFiles.add(new SupportingFile("util.mustache", packageName, "util.py"));
         supportingFiles.add(new SupportingFile("__init__.mustache", packageName + File.separatorChar + controllerPackage, "__init__.py"));
@@ -207,13 +124,18 @@ public class PythonAbstractConnexionServerCodegen extends DefaultCodegen impleme
         controllerPackage = packageName + "." + controllerPackage;
     }
 
-    private static String dropDots(String str) {
-        return str.replaceAll("\\.", "_");
-    }
-
     @Override
     public String apiPackage() {
         return controllerPackage;
+    }
+
+    @Override
+    public String toApiFilename(String name) {
+        // replace - with _ e.g. created-at => created_at
+        name = name.replaceAll("-", "_");
+
+        // e.g. PhoneNumberApi.py => phone_number_controller.py
+        return underscore(name) + "_controller";
     }
 
     /**
@@ -245,67 +167,6 @@ public class PythonAbstractConnexionServerCodegen extends DefaultCodegen impleme
             return "DefaultController";
         }
         return camelize(name, false) + "Controller";
-    }
-
-    @Override
-    public String toApiFilename(String name) {
-        return underscore(toApiName(name));
-    }
-
-    @Override
-    public String toApiTestFilename(String name) {
-        return "test_" + toApiFilename(name);
-    }
-
-    /**
-     * Escapes a reserved word as defined in the `reservedWords` array. Handle escaping
-     * those terms here.  This logic is only called if a variable matches the reserved words
-     *
-     * @return the escaped term
-     */
-    @Override
-    public String escapeReservedWord(String name) {
-        if (this.reservedWordsMappings().containsKey(name)) {
-            return this.reservedWordsMappings().get(name);
-        }
-        return "_" + name; // add an underscore to the name
-    }
-
-    /**
-     * Location to write api files.  You can use the apiPackage() as defined when the class is
-     * instantiated
-     */
-    @Override
-    public String apiFileFolder() {
-        return outputFolder + File.separator + apiPackage().replace('.', File.separatorChar);
-    }
-
-    @Override
-    public String getTypeDeclaration(Schema p) {
-        if (ModelUtils.isArraySchema(p)) {
-            ArraySchema ap = (ArraySchema) p;
-            Schema inner = ap.getItems();
-            return getSchemaType(p) + "[" + getTypeDeclaration(inner) + "]";
-        } else if (ModelUtils.isMapSchema(p)) {
-            Schema inner = ModelUtils.getAdditionalProperties(p);
-            return getSchemaType(p) + "[str, " + getTypeDeclaration(inner) + "]";
-        }
-        return super.getTypeDeclaration(p);
-    }
-
-    @Override
-    public String getSchemaType(Schema p) {
-        String schemaType = super.getSchemaType(p);
-        String type = null;
-        if (typeMapping.containsKey(schemaType)) {
-            type = typeMapping.get(schemaType);
-            if (languageSpecificPrimitives.contains(type)) {
-                return type;
-            }
-        } else {
-            type = toModelName(schemaType);
-        }
-        return type;
     }
 
     @Override
@@ -477,277 +338,6 @@ public class PythonAbstractConnexionServerCodegen extends DefaultCodegen impleme
     }
 
     @Override
-    public String toVarName(String name) {
-        // sanitize name
-        name = sanitizeName(name); // FIXME: a parameter should not be assigned. Also declare the methods parameters as 'final'.
-
-        // remove dollar sign
-        name = name.replaceAll("$", "");
-
-        // if it's all uppper case, convert to lower case
-        if (name.matches("^[A-Z_]*$")) {
-            name = name.toLowerCase(Locale.ROOT);
-        }
-
-        // underscore the variable name
-        // petId => pet_id
-        name = underscore(name);
-
-        // remove leading underscore
-        name = name.replaceAll("^_*", "");
-
-        // for reserved word or word starting with number, append _
-        if (isReservedWord(name) || name.matches("^\\d.*")) {
-            name = escapeReservedWord(name);
-        }
-
-        return name;
-    }
-
-    @Override
-    public String toParamName(String name) {
-        // to avoid conflicts with 'callback' parameter for async call
-        if ("callback".equals(name)) {
-            return "param_callback";
-        }
-
-        // should be the same as variable name
-        return toVarName(name);
-    }
-
-    @Override
-    public String toModelFilename(String name) {
-        // underscore the model file name
-        // PhoneNumber => phone_number
-        return underscore(dropDots(toModelName(name)));
-    }
-
-    @Override
-    public String toModelName(String name) {
-        name = sanitizeName(name); // FIXME: a parameter should not be assigned. Also declare the methods parameters as 'final'.
-        // remove dollar sign
-        name = name.replaceAll("$", "");
-
-        // model name cannot use reserved keyword, e.g. return
-        if (isReservedWord(name)) {
-            LOGGER.warn(name + " (reserved word) cannot be used as model name. Renamed to " + camelize("model_" + name));
-            name = "model_" + name; // e.g. return => ModelReturn (after camelize)
-        }
-
-        // model name starts with number
-        if (name.matches("^\\d.*")) {
-            LOGGER.warn(name + " (model name starts with number) cannot be used as model name. Renamed to " + camelize("model_" + name));
-            name = "model_" + name; // e.g. 200Response => Model200Response (after camelize)
-        }
-
-        if (!StringUtils.isEmpty(modelNamePrefix)) {
-            name = modelNamePrefix + "_" + name;
-        }
-
-        if (!StringUtils.isEmpty(modelNameSuffix)) {
-            name = name + "_" + modelNameSuffix;
-        }
-
-        // camelize the model name
-        // phone_number => PhoneNumber
-        return camelize(name);
-    }
-
-    @Override
-    public String toOperationId(String operationId) {
-        // throw exception if method name is empty (should not occur as an auto-generated method name will be used)
-        if (StringUtils.isEmpty(operationId)) {
-            throw new RuntimeException("Empty method name (operationId) not allowed");
-        }
-
-        // method name cannot use reserved keyword, e.g. return
-        if (isReservedWord(operationId)) {
-            LOGGER.warn(operationId + " (reserved word) cannot be used as method name. Renamed to " + underscore(sanitizeName("call_" + operationId)));
-            operationId = "call_" + operationId;
-        }
-
-        return underscore(sanitizeName(operationId));
-    }
-
-    /**
-     * Return the default value of the property
-     *
-     * @param p OpenAPI property object
-     * @return string presentation of the default value of the property
-     */
-    @Override
-    public String toDefaultValue(Schema p) {
-        if (ModelUtils.isBooleanSchema(p)) {
-            if (p.getDefault() != null) {
-                if (p.getDefault().toString().equalsIgnoreCase("false"))
-                    return "False";
-                else
-                    return "True";
-            }
-        } else if (ModelUtils.isDateSchema(p)) {
-            // TODO
-        } else if (ModelUtils.isDateTimeSchema(p)) {
-            // TODO
-        } else if (ModelUtils.isNumberSchema(p)) {
-            if (p.getDefault() != null) {
-                return p.getDefault().toString();
-            }
-        } else if (ModelUtils.isIntegerSchema(p)) {
-            if (p.getDefault() != null) {
-                return p.getDefault().toString();
-            }
-        } else if (ModelUtils.isStringSchema(p)) {
-            if (p.getDefault() != null) {
-                return "'" + (String) p.getDefault() + "'";
-            }
-        }
-
-        return null;
-    }
-
-    @Override
-    public void setParameterExampleValue(CodegenParameter p) {
-        String example;
-
-        if (p.defaultValue == null) {
-            example = p.example;
-        } else {
-            p.example = p.defaultValue;
-            return;
-        }
-
-        String type = p.baseType;
-        if (type == null) {
-            type = p.dataType;
-        }
-
-        if ("String".equalsIgnoreCase(type) || "str".equalsIgnoreCase(type)) {
-            if (example == null) {
-                example = p.paramName + "_example";
-            }
-            example = "'" + escapeText(example) + "'";
-        } else if ("Integer".equals(type) || "int".equals(type)) {
-            if (p.minimum != null) {
-                example = "" + (Integer.valueOf(p.minimum) + 1);
-            }
-            if (p.maximum != null) {
-                example = "" + p.maximum;
-            } else if (example == null) {
-                example = "56";
-            }
-
-        } else if ("Long".equalsIgnoreCase(type)) {
-            if (p.minimum != null) {
-                example = "" + (Long.valueOf(p.minimum) + 1);
-            }
-            if (p.maximum != null) {
-                example = "" + p.maximum;
-            } else if (example == null) {
-                example = "789";
-            }
-        } else if ("Float".equalsIgnoreCase(type) || "Double".equalsIgnoreCase(type)) {
-            if (p.minimum != null) {
-                example = "" + p.minimum;
-            } else if (p.maximum != null) {
-                example = "" + p.maximum;
-            } else if (example == null) {
-                example = "3.4";
-            }
-        } else if ("BOOLEAN".equalsIgnoreCase(type) || "bool".equalsIgnoreCase(type)) {
-            if (example == null) {
-                example = "True";
-            }
-        } else if ("file".equalsIgnoreCase(type)) {
-            example = "(BytesIO(b'some file data'), 'file.txt')";
-        } else if ("Date".equalsIgnoreCase(type)) {
-            if (example == null) {
-                example = "2013-10-20";
-            }
-            example = "'" + escapeText(example) + "'";
-        } else if ("DateTime".equalsIgnoreCase(type)) {
-            if (example == null) {
-                example = "2013-10-20T19:20:30+01:00";
-            }
-            example = "'" + escapeText(example) + "'";
-        } else if (!languageSpecificPrimitives.contains(type)) {
-            // type is a model class, e.g. User
-            example = "{}";
-        } else {
-            LOGGER.warn("Type " + type + " not handled properly in setParameterExampleValue");
-        }
-
-        if (p.items != null && p.items.defaultValue != null) {
-            example = p.items.defaultValue;
-        }
-        if (example == null) {
-            if (Boolean.TRUE.equals(p.isListContainer)) {
-                example = "[]";
-            }
-            else {
-                example = "None";
-            }
-        } else if (Boolean.TRUE.equals(p.isListContainer)) {
-            if (Boolean.TRUE.equals(p.isBodyParam)) {
-                example = "[" + example + "]";
-            }
-        } else if (Boolean.TRUE.equals(p.isMapContainer)) {
-            example = "{'key': " + example + "}";
-        }
-
-        p.example = example;
-    }
-
-    public void setPackageName(String packageName) {
-        this.packageName = packageName;
-    }
-
-    public void setPackageVersion(String packageVersion) {
-        this.packageVersion = packageVersion;
-    }
-
-
-    @Override
-    public String escapeQuotationMark(String input) {
-        // remove ' to avoid code injection
-        return input.replace("'", "");
-    }
-
-    @Override
-    public String escapeUnsafeCharacters(String input) {
-        // remove multiline comment
-        return input.replace("'''", "'_'_'");
-    }
-
-    @Override
-    public String toModelImport(String name) {
-        String modelImport;
-        if (StringUtils.startsWithAny(name, "import", "from")) {
-            modelImport = name;
-        } else {
-            modelImport = "from ";
-            if (!"".equals(modelPackage())) {
-                modelImport += modelPackage() + ".";
-            }
-            modelImport += toModelFilename(name) + " import " + name;
-        }
-        return modelImport;
-    }
-
-    @Override
-    public void postProcessModelProperty(CodegenModel model, CodegenProperty property) {
-        if (StringUtils.isNotEmpty(property.pattern)) {
-            addImport(model, "import re");
-        }
-        postProcessPattern(property.pattern, property.vendorExtensions);
-    }
-
-    @Override
-    public Map<String, Object> postProcessModels(Map<String, Object> objs) {
-        // process enum in models
-        return postProcessModelsEnum(objs);
-    }
-
-    @Override
     public Map<String, Object> postProcessAllModels(Map<String, Object> objs) {
         Map<String, Object> result = super.postProcessAllModels(objs);
         for (Map.Entry<String, Object> entry : result.entrySet()) {
@@ -772,11 +362,6 @@ public class PythonAbstractConnexionServerCodegen extends DefaultCodegen impleme
             }
         }
         return pyImports;
-    }
-
-    @Override
-    public void postProcessParameter(CodegenParameter parameter) {
-        postProcessPattern(parameter.pattern, parameter.vendorExtensions);
     }
 
     @Override
@@ -837,63 +422,6 @@ public class PythonAbstractConnexionServerCodegen extends DefaultCodegen impleme
             }
         }
         return objs;
-    }
-
-    /*
-     * The openapi pattern spec follows the Perl convention and style of modifiers. Python
-     * does not support this in as natural a way so it needs to convert it. See
-     * https://docs.python.org/2/howto/regex.html#compilation-flags for details.
-     */
-    public void postProcessPattern(String pattern, Map<String, Object> vendorExtensions) {
-        if (pattern != null) {
-            int i = pattern.lastIndexOf('/');
-
-            //Must follow Perl /pattern/modifiers convention
-            if (pattern.charAt(0) != '/' || i < 2) {
-                throw new IllegalArgumentException("Pattern must follow the Perl "
-                        + "/pattern/modifiers convention. " + pattern + " is not valid.");
-            }
-
-            String regex = pattern.substring(1, i).replace("'", "\\'");
-            List<String> modifiers = new ArrayList<String>();
-
-            for (char c : pattern.substring(i).toCharArray()) {
-                if (regexModifiers.containsKey(c)) {
-                    String modifier = regexModifiers.get(c);
-                    modifiers.add(modifier);
-                }
-            }
-
-            vendorExtensions.put("x-regex", regex);
-            vendorExtensions.put("x-modifiers", modifiers);
-        }
-    }
-
-    @Override
-    public void postProcessFile(File file, String fileType) {
-        if (file == null) {
-            return;
-        }
-        String pythonPostProcessFile = System.getenv("PYTHON_POST_PROCESS_FILE");
-        if (StringUtils.isEmpty(pythonPostProcessFile)) {
-            return; // skip if PYTHON_POST_PROCESS_FILE env variable is not defined
-        }
-
-        // only process files with py extension
-        if ("py".equals(FilenameUtils.getExtension(file.toString()))) {
-            String command = pythonPostProcessFile + " " + file.toString();
-            try {
-                Process p = Runtime.getRuntime().exec(command);
-                int exitValue = p.waitFor();
-                if (exitValue != 0) {
-                    LOGGER.error("Error running the command ({}). Exit value: {}", command, exitValue);
-                } else {
-                    LOGGER.info("Successfully executed: " + command);
-                }
-            } catch (Exception e) {
-                LOGGER.error("Error running the command ({}). Exception: {}", command, e.getMessage());
-            }
-        }
     }
 
 }

@@ -31,7 +31,7 @@ class ArrayOfArrayOfNumberOnly(object):
                             and the value is json key in definition.
     """
     openapi_types = {
-        'array_array_number': 'list[list[float]]'
+        'array_array_number': 'List[List[float]]'
     }
 
     attribute_map = {
@@ -53,7 +53,7 @@ class ArrayOfArrayOfNumberOnly(object):
 
 
         :return: The array_array_number of this ArrayOfArrayOfNumberOnly.  # noqa: E501
-        :rtype: list[list[float]]
+        :rtype: List[List[float]]
         """
         return self._array_array_number
 
@@ -63,7 +63,7 @@ class ArrayOfArrayOfNumberOnly(object):
 
 
         :param array_array_number: The array_array_number of this ArrayOfArrayOfNumberOnly.  # noqa: E501
-        :type: list[list[float]]
+        :type: List[List[float]]
         """
 
         self._array_array_number = array_array_number

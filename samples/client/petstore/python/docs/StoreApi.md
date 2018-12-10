@@ -58,7 +58,7 @@ No authorization required
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
 # **get_inventory**
-> dict(str, int) get_inventory()
+> Dict[str, int] get_inventory()
 
 Returns pet inventories by status
 
@@ -96,7 +96,7 @@ This endpoint does not need any parameter.
 
 ### Return type
 
-**dict(str, int)**
+**Dict[str, int]**
 
 ### Authorization
 
@@ -126,7 +126,7 @@ from pprint import pprint
 
 # create an instance of the API class
 api_instance = petstore_api.StoreApi()
-order_id = 56 # int | ID of pet that needs to be fetched
+order_id = 5 # int | ID of pet that needs to be fetched
 
 try:
     # Find purchase order by ID

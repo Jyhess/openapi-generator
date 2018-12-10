@@ -133,7 +133,7 @@ class UserApi(object):
         >>> result = thread.get()
 
         :param async_req bool
-        :param list[User] user: List of user object (required)
+        :param List[User] user: List of user object (required)
         :return: None
                  If the method is called asynchronously,
                  returns the request thread.
@@ -154,7 +154,7 @@ class UserApi(object):
         >>> result = thread.get()
 
         :param async_req bool
-        :param list[User] user: List of user object (required)
+        :param List[User] user: List of user object (required)
         :return: None
                  If the method is called asynchronously,
                  returns the request thread.
@@ -223,7 +223,7 @@ class UserApi(object):
         >>> result = thread.get()
 
         :param async_req bool
-        :param list[User] user: List of user object (required)
+        :param List[User] user: List of user object (required)
         :return: None
                  If the method is called asynchronously,
                  returns the request thread.
@@ -244,7 +244,7 @@ class UserApi(object):
         >>> result = thread.get()
 
         :param async_req bool
-        :param list[User] user: List of user object (required)
+        :param List[User] user: List of user object (required)
         :return: None
                  If the method is called asynchronously,
                  returns the request thread.

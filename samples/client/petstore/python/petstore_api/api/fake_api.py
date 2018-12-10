@@ -896,13 +896,13 @@ class FakeApi(object):
         >>> result = thread.get()
 
         :param async_req bool
-        :param list[str] enum_header_string_array: Header parameter enum test (string array)
+        :param List[str] enum_header_string_array: Header parameter enum test (string array)
         :param str enum_header_string: Header parameter enum test (string)
-        :param list[str] enum_query_string_array: Query parameter enum test (string array)
+        :param List[str] enum_query_string_array: Query parameter enum test (string array)
         :param str enum_query_string: Query parameter enum test (string)
         :param int enum_query_integer: Query parameter enum test (double)
         :param float enum_query_double: Query parameter enum test (double)
-        :param list[str] enum_form_string_array: Form parameter enum test (string array)
+        :param List[str] enum_form_string_array: Form parameter enum test (string array)
         :param str enum_form_string: Form parameter enum test (string)
         :return: None
                  If the method is called asynchronously,
@@ -925,13 +925,13 @@ class FakeApi(object):
         >>> result = thread.get()
 
         :param async_req bool
-        :param list[str] enum_header_string_array: Header parameter enum test (string array)
+        :param List[str] enum_header_string_array: Header parameter enum test (string array)
         :param str enum_header_string: Header parameter enum test (string)
-        :param list[str] enum_query_string_array: Query parameter enum test (string array)
+        :param List[str] enum_query_string_array: Query parameter enum test (string array)
         :param str enum_query_string: Query parameter enum test (string)
         :param int enum_query_integer: Query parameter enum test (double)
         :param float enum_query_double: Query parameter enum test (double)
-        :param list[str] enum_form_string_array: Form parameter enum test (string array)
+        :param List[str] enum_form_string_array: Form parameter enum test (string array)
         :param str enum_form_string: Form parameter enum test (string)
         :return: None
                  If the method is called asynchronously,
@@ -1138,7 +1138,7 @@ class FakeApi(object):
         >>> result = thread.get()
 
         :param async_req bool
-        :param dict(str, str) request_body: request body (required)
+        :param Dict[str, str] request_body: request body (required)
         :return: None
                  If the method is called asynchronously,
                  returns the request thread.
@@ -1159,7 +1159,7 @@ class FakeApi(object):
         >>> result = thread.get()
 
         :param async_req bool
-        :param dict(str, str) request_body: request body (required)
+        :param Dict[str, str] request_body: request body (required)
         :return: None
                  If the method is called asynchronously,
                  returns the request thread.

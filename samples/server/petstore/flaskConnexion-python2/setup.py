@@ -3,8 +3,6 @@
 import sys
 from setuptools import setup, find_packages
 
-NAME = "openapi_server"
-VERSION = "1.0.0"
 
 # To install the library, run the following
 #
@@ -21,8 +19,8 @@ REQUIRES = [
 ]
 
 setup(
-    name=NAME,
-    version=VERSION,
+    name="openapi-server",
+    version="1.0.0",
     description="OpenAPI Petstore",
     author_email="",
     url="",

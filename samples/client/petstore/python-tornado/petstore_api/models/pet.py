@@ -34,8 +34,8 @@ class Pet(object):
         'id': 'int',
         'category': 'Category',
         'name': 'str',
-        'photo_urls': 'list[str]',
-        'tags': 'list[Tag]',
+        'photo_urls': 'List[str]',
+        'tags': 'List[Tag]',
         'status': 'str'
     }
 
@@ -141,7 +141,7 @@ class Pet(object):
 
 
         :return: The photo_urls of this Pet.  # noqa: E501
-        :rtype: list[str]
+        :rtype: List[str]
         """
         return self._photo_urls
 
@@ -151,7 +151,7 @@ class Pet(object):
 
 
         :param photo_urls: The photo_urls of this Pet.  # noqa: E501
-        :type: list[str]
+        :type: List[str]
         """
         if photo_urls is None:
             raise ValueError("Invalid value for `photo_urls`, must not be `None`")  # noqa: E501
@@ -164,7 +164,7 @@ class Pet(object):
 
 
         :return: The tags of this Pet.  # noqa: E501
-        :rtype: list[Tag]
+        :rtype: List[Tag]
         """
         return self._tags
 
@@ -174,7 +174,7 @@ class Pet(object):
 
 
         :param tags: The tags of this Pet.  # noqa: E501
-        :type: list[Tag]
+        :type: List[Tag]
         """
 
         self._tags = tags

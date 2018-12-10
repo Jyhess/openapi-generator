@@ -370,14 +370,14 @@ configuration.password = 'YOUR_PASSWORD'
 
 # create an instance of the API class
 api_instance = petstore_api.FakeApi(petstore_api.ApiClient(configuration))
-number = 3.4 # float | None
-double = 3.4 # float | None
+number = 32.1 # float | None
+double = 67.8 # float | None
 pattern_without_delimiter = 'pattern_without_delimiter_example' # str | None
 byte = 'byte_example' # str | None
-integer = 56 # int | None (optional)
-int32 = 56 # int | None (optional)
+integer = 100 # int | None (optional)
+int32 = 200 # int | None (optional)
 int64 = 56 # int | None (optional)
-float = 3.4 # float | None (optional)
+float = 987.6 # float | None (optional)
 string = 'string_example' # str | None (optional)
 binary = '/path/to/file' # file | None (optional)
 date = '2013-10-20' # date | None (optional)
@@ -463,13 +463,13 @@ except ApiException as e:
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **enum_header_string_array** | [**list[str]**](str.md)| Header parameter enum test (string array) | [optional] 
+ **enum_header_string_array** | [**List[str]**](str.md)| Header parameter enum test (string array) | [optional] 
  **enum_header_string** | **str**| Header parameter enum test (string) | [optional] [default to &#39;-efg&#39;]
- **enum_query_string_array** | [**list[str]**](str.md)| Query parameter enum test (string array) | [optional] 
+ **enum_query_string_array** | [**List[str]**](str.md)| Query parameter enum test (string array) | [optional] 
  **enum_query_string** | **str**| Query parameter enum test (string) | [optional] [default to &#39;-efg&#39;]
  **enum_query_integer** | **int**| Query parameter enum test (double) | [optional] 
  **enum_query_double** | **float**| Query parameter enum test (double) | [optional] 
- **enum_form_string_array** | [**list[str]**](str.md)| Form parameter enum test (string array) | [optional] [default to &#39;$&#39;]
+ **enum_form_string_array** | [**List[str]**](str.md)| Form parameter enum test (string array) | [optional] [default to &#39;$&#39;]
  **enum_form_string** | **str**| Form parameter enum test (string) | [optional] [default to &#39;-efg&#39;]
 
 ### Return type
@@ -559,7 +559,7 @@ from pprint import pprint
 
 # create an instance of the API class
 api_instance = petstore_api.FakeApi()
-request_body = {'key': 'request_body_example'} # dict(str, str) | request body
+request_body = {'key': 'request_body_example'} # Dict[str, str] | request body
 
 try:
     # test inline additionalProperties
@@ -572,7 +572,7 @@ except ApiException as e:
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **request_body** | [**dict(str, str)**](str.md)| request body | 
+ **request_body** | [**Dict[str, str]**](str.md)| request body | 
 
 ### Return type
 

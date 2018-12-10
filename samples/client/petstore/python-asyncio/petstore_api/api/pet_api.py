@@ -230,8 +230,8 @@ class PetApi(object):
         >>> result = thread.get()
 
         :param async_req bool
-        :param list[str] status: Status values that need to be considered for filter (required)
-        :return: list[Pet]
+        :param List[str] status: Status values that need to be considered for filter (required)
+        :return: List[Pet]
                  If the method is called asynchronously,
                  returns the request thread.
         """
@@ -252,8 +252,8 @@ class PetApi(object):
         >>> result = thread.get()
 
         :param async_req bool
-        :param list[str] status: Status values that need to be considered for filter (required)
-        :return: list[Pet]
+        :param List[str] status: Status values that need to be considered for filter (required)
+        :return: List[Pet]
                  If the method is called asynchronously,
                  returns the request thread.
         """
@@ -309,7 +309,7 @@ class PetApi(object):
             body=body_params,
             post_params=form_params,
             files=local_var_files,
-            response_type='list[Pet]',  # noqa: E501
+            response_type='List[Pet]',  # noqa: E501
             auth_settings=auth_settings,
             async_req=local_var_params.get('async_req'),
             _return_http_data_only=local_var_params.get('_return_http_data_only'),  # noqa: E501
@@ -327,8 +327,8 @@ class PetApi(object):
         >>> result = thread.get()
 
         :param async_req bool
-        :param list[str] tags: Tags to filter by (required)
-        :return: list[Pet]
+        :param List[str] tags: Tags to filter by (required)
+        :return: List[Pet]
                  If the method is called asynchronously,
                  returns the request thread.
         """
@@ -349,8 +349,8 @@ class PetApi(object):
         >>> result = thread.get()
 
         :param async_req bool
-        :param list[str] tags: Tags to filter by (required)
-        :return: list[Pet]
+        :param List[str] tags: Tags to filter by (required)
+        :return: List[Pet]
                  If the method is called asynchronously,
                  returns the request thread.
         """
@@ -406,7 +406,7 @@ class PetApi(object):
             body=body_params,
             post_params=form_params,
             files=local_var_files,
-            response_type='list[Pet]',  # noqa: E501
+            response_type='List[Pet]',  # noqa: E501
             auth_settings=auth_settings,
             async_req=local_var_params.get('async_req'),
             _return_http_data_only=local_var_params.get('_return_http_data_only'),  # noqa: E501

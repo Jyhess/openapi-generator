@@ -32,7 +32,7 @@ class EnumArrays(object):
     """
     openapi_types = {
         'just_symbol': 'str',
-        'array_enum': 'list[str]'
+        'array_enum': 'List[str]'
     }
 
     attribute_map = {
@@ -85,7 +85,7 @@ class EnumArrays(object):
 
 
         :return: The array_enum of this EnumArrays.  # noqa: E501
-        :rtype: list[str]
+        :rtype: List[str]
         """
         return self._array_enum
 
@@ -95,7 +95,7 @@ class EnumArrays(object):
 
 
         :param array_enum: The array_enum of this EnumArrays.  # noqa: E501
-        :type: list[str]
+        :type: List[str]
         """
         allowed_values = ["fish", "crab"]  # noqa: E501
         if not set(array_enum).issubset(set(allowed_values)):
